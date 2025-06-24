@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoFoco+ | Postos de Atendimento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Ovo&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Esconde checkbox */
+        #menu-toggle {
+            display: none;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Ícone hambúrguer */
+        .menu-hamburguer {
+            display: none; /* só aparece no mobile */
+            flex-direction: column;
+            cursor: pointer;
+            width: 30px;
+            height: 25px;
+            justify-content: space-between;
+        }
+
+        .menu-hamburguer span {
+            display: block;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+
+        /* Menu desktop normal */
+        .menu-grande {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Menu mobile, escondido inicialmente */
+        .menu-mobile {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* Mostrar só no mobile */
+        @media (max-width: 768px) {
+            /* Esconde menu desktop */
+            .menu-grande {
+                display: none;
+            }
+
+            /* Mostra hambúrguer */
+            .menu-hamburguer {
+                display: flex;
+            }
+
+            /* Mostra menu mobile quando checkbox está checado */
+            #menu-toggle:checked ~ .menu-mobile {
+                display: flex;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Rubik', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f0fdf4;
+            color: #1b4332;
+            padding: 0;
+            transition: background 0.3s, color 0.3s;
+            display: flex; /* Added for vertical centering of main content */
+            flex-direction: column; /* Added for vertical centering of main content */
+            min-height: 100vh; /* Added for vertical centering of main content */
+        }
+
+        body.dark-mode {
+            background: #121212;
+            color: #e0e0e0;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu {
+            display: flex;
+            justify-content: space-between; /* Use space-between para o logo à esquerda e botões à direita */
+            align-items: center; /* Centraliza verticalmente os itens */
+            background-color: #7F0D0D;
+            padding: 1rem;
+            margin-bottom: 0; /* Altere esta linha para 0 */
+        }
+
+        .logo {
+            height: 150px;
+            max-width: 150px;
+            object-fit: contain;
+        }
+
+        .menu-btn {
+            text-decoration: none;
+            background: #6a040f;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            color: #fff;
+            transition: background 0.3s;
+            cursor: pointer;
+            min-width: 120px; /* Adicionado para padronizar o tamanho */
+            text-align: center; /* Centraliza o texto */
+        }
+        /* Estilos para a nova seção de informações sobre a dengue */
+        .info-dengue {
+            max-width: 1000px; /* Largura máxima do conteúdo */
+            margin: 3rem auto; /* Centraliza e adiciona margem acima/abaixo */
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-dengue .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            color: #7F0D0D; /* Cor para o título principal da seção */
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .info-dengue .section-title::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: #52b788; /* Linha decorativa abaixo do título */
+            border-radius: 2px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3rem; /* Espaçamento entre os blocos de informação */
+            gap: 2rem; /* Espaçamento entre imagem e texto */
+            padding: 1.5rem;
+            border-radius: 12px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0; /* Remove margem do último item */
+        }
+
+        .info-item.item-left {
+            flex-direction: row; /* Imagem à esquerda, texto à direita */
+        }
+
+        .info-item.item-right {
+            flex-direction: row-reverse; /* Imagem à direita, texto à esquerda */
+        }
+
+        .info-image {
+            width: 200px; /* Largura fixa da imagem */
+            height: 150px; /* Altura fixa da imagem */
+            object-fit: cover; /* Garante que a imagem preencha o espaço sem distorcer */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            flex-shrink: 0; /* Impede que a imagem encolha */
+        }
+
+        .info-content {
+            flex-grow: 1; /* Permite que o conteúdo de texto ocupe o espaço restante */
+        }
+
+        .info-content h3 {
+            font-size: 1.8rem;
+            color: #1b4332;
+            margin-bottom: 1rem;
+            text-align: center; /* Centraliza o título do item */
+        }
+
+        .info-content p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            text-align: justify; /* Justifica o texto */
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .info-content ul {
+            list-style: disc; /* Marcadores de lista */
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .info-content ul li {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        /* Modo Escuro para a nova seção */
+        body.dark-mode .info-dengue {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .info-dengue .section-title {
+            color: #eee;
+        }
+
+        body.dark-mode .info-dengue .section-title::after {
+            background-color: #90caf9;
+        }
+
+        body.dark-mode .info-item {
+            background-color: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        body.dark-mode .info-content h3 {
+            color: #eee;
+        }
+
+        body.dark-mode .info-content p,
+        body.dark-mode .info-content ul,
+        body.dark-mode .info-content ul li {
+            color: #ccc;
+        }
+
+        /* Media Queries para responsividade */
+        @media (max-width: 768px) {
+            .info-dengue {
+                padding: 1rem;
+                margin: 2rem auto;
+            }
+
+            .info-dengue .section-title {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .info-item,
+            .info-item.item-left,
+            .info-item.item-right {
+                flex-direction: column; /* Empilha imagem e texto em telas menores */
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .info-image {
+                width: 80%; /* Aumenta a largura da imagem no mobile */
+                height: auto;
+                max-width: 250px; /* Garante que a imagem não fique gigante */
+            }
+
+            .info-content h3 {
+                font-size: 1.5rem;
+            }
+
+            .info-content p {
+                font-size: 1rem;
+            }
+
+            .info-content ul {
+                text-align: left; /* Mantém a lista alinhada à esquerda */
+                margin-left: auto;
+                margin-right: auto;
+                max-width: fit-content; /* Ou um valor fixo se preferir */
+            }
+        }
+        .menu-btn:hover {
+            background: #1e4232;
+        }
+
+        body.dark-mode .menu {
+            background-color: #333;
+        }
+
+        body.dark-mode .menu-btn {
+            background: #555;
+            color: #fff;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            display: none;
+        }
+
+        .tab-label {
+            background: #caffbf;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab:checked + .tab-label {
+            background: #a71010;
+            color: #fff;
+        }
+
+        body.dark-mode .tab-label {
+            background: #444;
+            color: #eee;
+        }
+
+        body.dark-mode .tab:checked + .tab-label {
+            background: #90caf9;
+            color: #000;
+        }
+
+        .tab-content {
+            display: none;
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            margin-top: 1rem;
+            animation: fadeContent 0.5s ease-in-out;
+        }
+
+        body.dark-mode .tab-content,
+        body.dark-mode form {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        #tab1:checked ~ .content-noticias,
+        #tab2:checked ~ .content-denuncia {
+            display: block;
+        }
+
+        .carrossel {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 1rem;
+        }
+
+        .carrossel div {
+            min-width: 250px;
+            flex: 0 0 auto;
+            scroll-snap-align: start;
+            transition: transform 0.3s;
+        }
+
+        .carrossel div:hover {
+            transform: scale(1.05);
+        }
+
+        .carrossel img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        input, textarea, button {
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            background: linear-gradient(to right, #ffd166, #fca311);
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #e76f51;
+        }
+
+        #confirmacao {
+            display: none;
+        }
+
+        #confirmacao:target {
+            display: block;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #d0f0c0;
+            border: 2px solid #2e7d32;
+            border-radius: 8px;
+            color: #2e7d32;
+        }
+        /*conteiner Nossa missão */
+        .frase-impacto {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #e8f5e9, #fffde7);
+            border-radius: 16px;
+            margin: 2rem auto;
+            max-width: 100%;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .frase-impacto h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            line-height: 1.4;
+            color: #7F0D0D;
+        }
+
+        .frase-impacto p {
+            font-size: 1.3rem;
+            font-weight: lighter; /* Manter 'lighter' ou '600', não os dois */
+            text-align: justify; /* Justifica o texto */
+            max-width: 900px; /* Define uma largura máxima para o parágrafo */
+            margin-left: auto; /* Centraliza o parágrafo horizontalmente */
+            margin-right: auto; /* Centraliza o parágrafo horizontalmente */
+            padding: 0 1rem; /* Adiciona um pequeno padding interno para que o texto não cole nas bordas em telas menores */
+        }
+
+        .secao h2 {
+            font-size: 2rem; /* Tamanho do título da seção */
+            margin-bottom: 16px; /* Margem inferior */
+            text-align: center;
+        }
+
+        .secao p {
+            color: #000000; /* Cor do texto */
+            max-width: 800px; /* Largura máxima do parágrafo */
+            margin: 0 auto; /* Centraliza o parágrafo */
+        }
+        .textbody{
+            text-align:center;
+            padding: 2rem 1rem;
+            background: linear-gradient(135deg, #e8f5e9, #fffde7);
+            border-radius: 16px;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+
+        }
+        /* Estilo geral do container */
+        .info-box {
+            background-color: #f5f8fa;
+            border-left: 6px solid #7F0D0D;
+            padding: 20px 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease; /* Transição suave */
+        }
+        /*Efeito ao passar o mouse*/
+        .info-box:hover {
+            transform: scale(1.02);
+        }
+
+        /* Título do texto */
+        .info-box h2 {
+            color: #2c3e50;
+            font-size: 1.6em;
+            margin-bottom: 10px;
+        }
+
+        /* Parágrafos */
+        .info-box p {
+            color: #444;
+            line-height: 1.7;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        /* Listas dentro do texto */
+        .info-box ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            color: #2c3e50;
+
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+        }
+
+        /* Texto em destaque */
+        .info-box strong {
+            color: #d35400;
+        }
+
+        /* Links */
+        .info-box a {
+            color: #2c7be5;
+            text-decoration: underline;
+        }
+        .mapa-local {
+            background-color: #eee;
+            height: 400px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            margin-top: 20px;
+            border: 1px dashed #ccc;
+        }
+
+        .site-footer {
+            background-color: #7F0D0D;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 20px 15px;
+            font-size: 0.95em;
+            margin-top: auto; /* Pushes the footer to the bottom */
+        }
+
+        .site-footer a {
+            color: #1abc9c;
+            text-decoration: none;
+        }
+
+        .site-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-content {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeContent {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .frase-impacto h1 { font-size: 1.5rem; }
+            .frase-impacto p  { font-size: 1.1rem; }
+        }
+
+        @media (max-width: 600px) {
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .frase-impacto h1 { font-size: 1.2rem; }
+            .frase-impacto p  { font-size: 1rem; }
+        }
+
+        /* Estilos para o novo menu principal horizontal */
+        .main-nav {
+            background-color: #6a040f; /* Um tom de vermelho escuro */
+            padding: 0.75rem 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .main-nav ul {
+            list-style: none; /* Remove os marcadores de lista */
+            padding: 0;
+            margin: 0;
+            display: flex; /* Para os itens ficarem em linha */
+            justify-content: center; /* Centraliza os itens do menu */
+            flex-wrap: wrap; /* Permite que os itens quebrem linha em telas menores */
+            gap: 1.5rem; /* Espaçamento entre os itens do menu */
+        }
+
+        .main-nav ul li a {
+            text-decoration: none;
+            color: #fff; /* Cor do texto dos links */
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            white-space: nowrap; /* Impede que o texto quebre linha */
+        }
+
+        .main-nav ul li a:hover,
+        .main-nav ul li a.active { /* Adicione uma classe 'active' com JS se quiser */
+            background-color: #a71010; /* Cor de fundo ao passar o mouse */
+            color: #fff;
+        }
+
+        /* Ajustes para o modo escuro */
+        body.dark-mode .main-nav {
+            background-color: #222;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        body.dark-mode .main-nav ul li a {
+            color: #eee;
+        }
+
+        body.dark-mode .main-nav ul li a:hover,
+        body.dark-mode .main-nav ul li a.active {
+            background-color: #555;
+            color: #fff;
+        }
+
+        /* Media query para o menu principal em telas menores (opcional, se quiser empilhar) */
+        @media (max-width: 768px) {
+            .main-nav ul {
+                flex-direction: column; /* Empilha os itens verticalmente */
+                gap: 0.5rem;
+            }
+            .main-nav ul li a {
+                display: block; /* Ocupa a largura total quando empilhado */
+                padding: 0.75rem 1rem;
+            }
+        }
+        /* Specific styles for atendimento.html */
+        .secao-postos {
+            padding: 40px 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-grow: 1; /* Make it take available space */
+        }
+        body.dark-mode .secao-postos {
+            background-color: #1e1e1e;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            color: #eee;
+        }
+
+        .secao-postos h2 {
+            font-size: 2.2rem;
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        body.dark-mode .secao-postos h2 {
+            color: #eee;
+        }
+
+        .secao-postos p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+        body.dark-mode .secao-postos p {
+            color: #ccc;
+        }
+
+        .lista-postos {
+            list-style: none;
+            padding: 0;
+        }
+
+        .posto-item {
+            background-color: #f0f4f8;
+            border: 1px solid #e0e7ee;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        body.dark-mode .posto-item {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .posto-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .posto-icone {
+            font-size: 1.8rem;
+            color: #701212;
+            flex-shrink: 0;
+        }
+        body.dark-mode .posto-icone {
+            color: #90caf9;
+        }
+
+        .posto-info h3 {
+            font-size: 1.4rem;
+            color: #701212;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        body.dark-mode .posto-info h3 {
+            color: #eee;
+        }
+
+        .posto-info p {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 5px;
+            text-align: left; /* Alinha o texto das informações do posto à esquerda */
+        }
+        body.dark-mode .posto-info p {
+            color: #ccc;
+        }
+        .posto-info p strong {
+            color: #333;
+        }
+        body.dark-mode .posto-info p strong {
+            color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav class="menu">
+        <div class="menu-esquerda">
+            <img src="logo.png" alt="Logo EcoFoco+" class="logo" />
+        </div>
+
+        <input type="checkbox" id="menu-toggle" />
+
+        <label for="menu-toggle" class="menu-hamburguer">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
+
+        <div class="menu-direita menu-grande">
+            <a href="main-login.html" class="menu-btn">Login</a>
+            <a href="main-cadastro.html" class="menu-btn">Cadastro</a>
+            <button id="modoEscuroBtn" class="menu-btn">🌙 Modo Escuro</button>
+        </div>
+
+        <div class="menu-mobile">
+            <a href="main-login.html" class="menu-btn">Login</a>
+            <button id="modoEscuroBtnMobile" class="menu-btn">🌙 Modo Escuro</button>
+        </div>
+    </nav>
+</header>
+
+<nav class="main-nav">
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="denuncia.html">Denuncie</a></li>
+        <li><a href="index.html#sobre-o-projeto">Sobre o Projeto</a></li>
+        <li><a href="index.html#dicas-prevencao">Dicas de Prevenção</a></li>
+        <li><a href="atendimento.html">Postos de Atendimento</a></li>
+        <li><a href="faleconosco.html">Fale Conosco</a></li>
+    </ul>
+</nav>
+
+<section class="secao-postos">
+    <h2>Postos de Atendimento em Lins</h2>
+    <p>
+        Todas as Unidades Básicas de Saúde (UBS) de Lins estão aptas a realizar o acolhimento e o manejo de pacientes com casos suspeitos de
+        dengue, com avaliação médica para os casos necessários. O intuito é facilitar o atendimento de todos e melhor atendê-los.
+    </p>
+
+    <ul class="lista-postos">
+        <li class="posto-item">
+            <span class="posto-icone">&#127973;</span> <div class="posto-info">
+                <h3>Unidade de Pronto Atendimento (UPA)</h3>
+                <p><strong>Endereço:</strong> Rua São Vicente de Paula, 1370 - Jardim Americano, Lins - SP</p>
+                <p><strong>Horário de Funcionamento:</strong> Atendimento 24 horas</p>
+                <p><strong>Telefone:</strong> Não informado no material, verificar com a prefeitura.</p>
+                <p><strong>Email:</strong> Não informado no material, verificar com a prefeitura.</p>
+            </div>
+        </li>
+        <li class="posto-item">
+            <span class="posto-icone">&#127973;</span>
+            <div class="posto-info">
+                <h3>UBS Morumbi - Paschoal Angotti</h3>
+                <p><strong>Endereço:</strong> Rua Dr Antonio Fernandes Ibanez, 307 – Morumbi</p>
+                <p><strong>Horário de Funcionamento:</strong> 06h às 18h (segunda a sexta-feira)</p>
+                <p><strong>Telefone:</strong> (14) 3532-3002 / (14) 3523-4466 / (14) 99901-0813</p>
+                <p><strong>Email:</strong> ubsmohanna.adas@gmail.com</p>
+            </div>
+        </li>
+        <li class="posto-item">
+            <span class="posto-icone">&#127973;</span>
+            <div class="posto-info">
+                <h3>UBS Ribeiro – Dr. Péricles da Silva Pereira</h3>
+                <p><strong>Endereço:</strong> Rua Dr. João José Garcez Novaes, 287 – Ribeiro</p>
+                <p><strong>Horário de Funcionamento:</strong> 06h às 21h (segunda a sexta-feira)</p>
+                <p><strong>Telefone:</strong> (14) 3523-6757 / (14) 3523-4037 / (14) 99615-4997</p>
+                <p><strong>Email:</strong> ubsribeiro2023@gmail.com</p>
+            </div>
+        </li>
+        <li class="posto-item">
+            <span class="posto-icone">&#127973;</span>
+            <div class="posto-info">
+                <h3>UBS Rebouças – Dr. Nilton Nicolau Naufal</h3>
+                <p><strong>Endereço:</strong> Rua Rosa Maria Angelica, 55 – Rebouças</p>
+                <p><strong>Horário de Funcionamento:</strong> 06h às 18h (segunda a sexta-feira)</p>
+                <p><strong>Telefone:</strong> (14) 3523-2572 (14) 3523-4092 (14) 99840-6164</p>
+                <p><strong>Email:</strong> ubsreboucas@lins.sp.gov.br</p>
+            </div>
+        </li>
+    </ul>
+</section>
+
+<footer class="site-footer">
+    <div class="footer-content">
+        <p>© 2025 ECOFOCO+. Todos os direitos reservados.</p>
+        <p>
+            Desenvolvido por Allisson, Livia, Rayane, Renan, Taynara e Vanessa | Fatec, 1º Semestre/ADS </a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    function toggleDarkMode() {
+        const isDark = document.body.classList.toggle("dark-mode");
+        localStorage.setItem("modoEscuro", isDark ? "true" : "false");
+
+        const botao = document.getElementById("modoEscuroBtn");
+        // Check if the desktop button exists before trying to update its text
+        if (botao) {
+            botao.textContent = isDark ? "☀️ Modo Claro" : "🌙 Modo Escuro";
+        }
+
+        const botaoMobile = document.getElementById("modoEscuroBtnMobile");
+        // Check if the mobile button exists before trying to update its text
+        if (botaoMobile) {
+            botaoMobile.textContent = isDark ? "☀️ Modo Claro" : "🌙 Modo Escuro";
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        const preferencia = localStorage.getItem("modoEscuro");
+        if (preferencia === "true") {
+            document.body.classList.add("dark-mode");
+            // Update both desktop and mobile buttons on load if dark mode is active
+            const desktopBtn = document.getElementById("modoEscuroBtn");
+            if (desktopBtn) {
+                desktopBtn.textContent = "☀️ Modo Claro";
+            }
+            const mobileBtn = document.getElementById("modoEscuroBtnMobile");
+            if (mobileBtn) {
+                mobileBtn.textContent = "☀️ Modo Claro";
+            }
+        }
+
+        const desktopBtn = document.getElementById("modoEscuroBtn");
+        if (desktopBtn) {
+            desktopBtn.addEventListener("click", toggleDarkMode);
+        }
+
+        const mobileBtn = document.getElementById("modoEscuroBtnMobile");
+        if (mobileBtn) {
+            mobileBtn.addEventListener("click", toggleDarkMode);
+        }
+    });
+</script>
+
+</body>
+</html>
+                    
